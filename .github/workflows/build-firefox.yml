@@ -33,25 +33,26 @@ jobs:
       - name: Bootstrap Environment
         shell: cmd
         env:
-          # Tells mach it is running in a headless CI environment
           MOZ_AUTOMATION: 1
         run: |
-          C:\mozilla-build\start-shell.bat -no-start -defterm -c "export PATH=\"$PATH:/c/Program Files/Git/cmd:/c/Program Files/Git/bin\" && cd '%GITHUB_WORKSPACE:\=/%' && ./mach --no-interactive bootstrap --application-choice=browser"
-          
+          C:\mozilla-build\start-shell.bat -no-start -defterm -c "export PATH=$PATH:/c/Progra~1/Git/cmd:/c/Progra~1/Git/bin && cd '%GITHUB_WORKSPACE:\=/%' && ./mach --no-interactive bootstrap --application-choice=browser"
+
       - name: Build Firefox
         shell: cmd
+        env:
+          MOZ_AUTOMATION: 1
         run: |
-          C:\mozilla-build\start-shell.bat -no-start -defterm -c "cd '%GITHUB_WORKSPACE:\=/%' && ./mach build"
+          C:\mozilla-build\start-shell.bat -no-start -defterm -c "export PATH=$PATH:/c/Progra~1/Git/cmd:/c/Progra~1/Git/bin && cd '%GITHUB_WORKSPACE:\=/%' && ./mach build"
 
       - name: Package Installer
         shell: cmd
+        env:
+          MOZ_AUTOMATION: 1
         run: |
-          C:\mozilla-build\start-shell.bat -no-start -defterm -c "cd '%GITHUB_WORKSPACE:\=/%' && ./mach installer"
+          C:\mozilla-build\start-shell.bat -no-start -defterm -c "export PATH=$PATH:/c/Progra~1/Git/cmd:/c/Progra~1/Git/bin && cd '%GITHUB_WORKSPACE:\=/%' && ./mach installer"
 
       - name: Upload Installer Artifact
         uses: actions/upload-artifact@v4
         with:
           name: custom-firefox-installer
           path: obj-*/dist/install/sea/*.exe
-
-
