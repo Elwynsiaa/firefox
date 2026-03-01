@@ -11,8 +11,6 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      # Standard GitHub Windows runners have a lot of pre-installed SDKs that eat up disk space. 
-      # We delete some massive unused ones to make room for the massive Firefox build.
       - name: Free Up Disk Space
         shell: bash
         run: |
@@ -34,20 +32,19 @@ jobs:
 
       - name: Bootstrap Environment
         shell: cmd
-        # Added -no-start -defterm to prevent it from detaching
+        # Added a 'cd' command to navigate to the correct directory before running mach
         run: |
-          C:\mozilla-build\start-shell.bat -no-start -defterm -c "./mach bootstrap --application-choice=browser --no-interactive"
+          C:\mozilla-build\start-shell.bat -no-start -defterm -c "cd '%GITHUB_WORKSPACE:\=/%' && ./mach bootstrap --application-choice=browser --no-interactive"
 
       - name: Build Firefox
         shell: cmd
-        # This is where the magic happens. Expect this step to take 2+ hours!
         run: |
-          C:\mozilla-build\start-shell.bat -no-start -defterm -c "./mach build"
+          C:\mozilla-build\start-shell.bat -no-start -defterm -c "cd '%GITHUB_WORKSPACE:\=/%' && ./mach build"
 
       - name: Package Installer
         shell: cmd
         run: |
-          C:\mozilla-build\start-shell.bat -no-start -defterm -c "./mach installer"
+          C:\mozilla-build\start-shell.bat -no-start -defterm -c "cd '%GITHUB_WORKSPACE:\=/%' && ./mach installer"
 
       - name: Upload Installer Artifact
         uses: actions/upload-artifact@v4
