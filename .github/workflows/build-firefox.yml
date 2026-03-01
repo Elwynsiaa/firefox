@@ -32,10 +32,12 @@ jobs:
 
       - name: Bootstrap Environment
         shell: cmd
-        # Added a 'cd' command to navigate to the correct directory before running mach
+        env:
+          # Tells mach it is running in a headless CI environment
+          MOZ_AUTOMATION: 1
         run: |
-          C:\mozilla-build\start-shell.bat -no-start -defterm -c "cd '%GITHUB_WORKSPACE:\=/%' && ./mach --no-interactive bootstrap --application-choice=browser"
-
+          C:\mozilla-build\start-shell.bat -no-start -defterm -c "export PATH=\"$PATH:/c/Program Files/Git/cmd:/c/Program Files/Git/bin\" && cd '%GITHUB_WORKSPACE:\=/%' && ./mach --no-interactive bootstrap --application-choice=browser"
+          
       - name: Build Firefox
         shell: cmd
         run: |
@@ -51,4 +53,5 @@ jobs:
         with:
           name: custom-firefox-installer
           path: obj-*/dist/install/sea/*.exe
+
 
