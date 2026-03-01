@@ -1,57 +1,56 @@
 name: Build Firefox Windows Installer
 
-# Trigger the build manually from the GitHub Actions tab
 on:
-  workflow_dispatch: 
+  workflow_dispatch:
 
 jobs:
   build:
-    # We highly recommend using a self-hosted or larger runner here
-    runs-on: windows-latest 
+    runs-on: windows-latest
     
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
 
+      # Standard GitHub Windows runners have a lot of pre-installed SDKs that eat up disk space. 
+      # We delete some massive unused ones to make room for the massive Firefox build.
+      - name: Free Up Disk Space
+        shell: bash
+        run: |
+          rm -rf "C:/Program Files/Android"
+          rm -rf "C:/ProgramData/Microsoft/AndroidNDK"
+          rm -rf "C:/Program Files/dotnet"
+
       - name: Download and Install MozillaBuild
         run: |
-          # Download the latest MozillaBuild installer
           Invoke-WebRequest -Uri "https://ftp.mozilla.org/pub/mozilla/libraries/win32/MozillaBuildSetup-Latest.exe" -OutFile MozillaBuildSetup.exe
-          
-          # Install silently (/S) to the default directory (C:\mozilla-build)
           Start-Process -FilePath .\MozillaBuildSetup.exe -ArgumentList "/S" -Wait
 
       - name: Create mozconfig
         run: |
-          # The mozconfig file tells the build system how to configure your build
-          echo "ac_add_options --enable-application=browser" > mozconfig
-          echo "ac_add_options --enable-optimize" >> mozconfig
-          echo "ac_add_options --disable-debug" >> mozconfig
-          # Enable the creation of the installer/updater package
-          echo "ac_add_options --enable-update-packaging" >> mozconfig
+          echo ac_add_options --enable-application=browser > mozconfig
+          echo ac_add_options --enable-optimize >> mozconfig
+          echo ac_add_options --disable-debug >> mozconfig
+          echo ac_add_options --enable-update-packaging >> mozconfig
 
       - name: Bootstrap Environment
         shell: cmd
+        # Added -no-start -defterm to prevent it from detaching
         run: |
-          REM Use MozillaBuild's shell to run the bootstrap process.
-          REM --application-choice=browser and --no-interactive ensure it doesn't pause for user input.
-          C:\mozilla-build\start-shell.bat -c "./mach bootstrap --application-choice=browser --no-interactive"
+          C:\mozilla-build\start-shell.bat -no-start -defterm -c "./mach bootstrap --application-choice=browser --no-interactive"
 
       - name: Build Firefox
         shell: cmd
+        # This is where the magic happens. Expect this step to take 2+ hours!
         run: |
-          REM This step compiles the browser and will take a significant amount of time
-          C:\mozilla-build\start-shell.bat -c "./mach build"
+          C:\mozilla-build\start-shell.bat -no-start -defterm -c "./mach build"
 
       - name: Package Installer
         shell: cmd
         run: |
-          REM This step bundles the compiled binaries into a Windows .exe installer
-          C:\mozilla-build\start-shell.bat -c "./mach installer"
+          C:\mozilla-build\start-shell.bat -no-start -defterm -c "./mach installer"
 
       - name: Upload Installer Artifact
         uses: actions/upload-artifact@v4
         with:
           name: custom-firefox-installer
-          # The resulting installer is typically dropped in the obj-dir under dist/install/sea/
           path: obj-*/dist/install/sea/*.exe
