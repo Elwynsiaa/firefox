@@ -34,7 +34,7 @@ jobs:
         shell: cmd
         # Added a 'cd' command to navigate to the correct directory before running mach
         run: |
-          C:\mozilla-build\start-shell.bat -no-start -defterm -c "cd '%GITHUB_WORKSPACE:\=/%' && ./mach bootstrap --application-choice=browser --no-interactive"
+          C:\mozilla-build\start-shell.bat -no-start -defterm -c "cd '%GITHUB_WORKSPACE:\=/%' && ./mach --no-interactive bootstrap --application-choice=browser"
 
       - name: Build Firefox
         shell: cmd
@@ -51,3 +51,4 @@ jobs:
         with:
           name: custom-firefox-installer
           path: obj-*/dist/install/sea/*.exe
+
