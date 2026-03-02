@@ -34,22 +34,29 @@ jobs:
         shell: cmd
         env:
           MOZ_AUTOMATION: 1
+          # Manually set the variables start-shell.bat usually provides
+          MOZILLABUILD: C:\mozilla-build\
+          MSYSTEM: MINGW64
         run: |
-          C:\mozilla-build\start-shell.bat -no-start -defterm -c "export PATH=$PATH:/c/Progra~1/Git/cmd:/c/Progra~1/Git/bin && cd '%GITHUB_WORKSPACE:\=/%' && ./mach --no-interactive bootstrap --application-choice=browser"
+          C:\mozilla-build\msys2\usr\bin\bash.exe --login -c "export PATH=$PATH:/c/Progra~1/Git/cmd:/c/Progra~1/Git/bin && cd '%GITHUB_WORKSPACE:\=/%' && ./mach --no-interactive bootstrap --application-choice=browser"
 
       - name: Build Firefox
         shell: cmd
         env:
           MOZ_AUTOMATION: 1
+          MOZILLABUILD: C:\mozilla-build\
+          MSYSTEM: MINGW64
         run: |
-          C:\mozilla-build\start-shell.bat -no-start -defterm -c "export PATH=$PATH:/c/Progra~1/Git/cmd:/c/Progra~1/Git/bin && cd '%GITHUB_WORKSPACE:\=/%' && ./mach build"
+          C:\mozilla-build\msys2\usr\bin\bash.exe --login -c "export PATH=$PATH:/c/Progra~1/Git/cmd:/c/Progra~1/Git/bin && cd '%GITHUB_WORKSPACE:\=/%' && ./mach build"
 
       - name: Package Installer
         shell: cmd
         env:
           MOZ_AUTOMATION: 1
+          MOZILLABUILD: C:\mozilla-build\
+          MSYSTEM: MINGW64
         run: |
-          C:\mozilla-build\start-shell.bat -no-start -defterm -c "export PATH=$PATH:/c/Progra~1/Git/cmd:/c/Progra~1/Git/bin && cd '%GITHUB_WORKSPACE:\=/%' && ./mach installer"
+          C:\mozilla-build\msys2\usr\bin\bash.exe --login -c "export PATH=$PATH:/c/Progra~1/Git/cmd:/c/Progra~1/Git/bin && cd '%GITHUB_WORKSPACE:\=/%' && ./mach installer"
 
       - name: Upload Installer Artifact
         uses: actions/upload-artifact@v4
