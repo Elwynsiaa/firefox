@@ -19,44 +19,39 @@ jobs:
           rm -rf "C:/Program Files/dotnet"
 
       - name: Download and Install MozillaBuild
+        shell: pwsh
         run: |
           Invoke-WebRequest -Uri "https://ftp.mozilla.org/pub/mozilla/libraries/win32/MozillaBuildSetup-Latest.exe" -OutFile MozillaBuildSetup.exe
           Start-Process -FilePath .\MozillaBuildSetup.exe -ArgumentList "/S" -Wait
 
       - name: Create mozconfig
+        shell: bash
         run: |
-          echo ac_add_options --enable-application=browser > mozconfig
-          echo ac_add_options --enable-optimize >> mozconfig
-          echo ac_add_options --disable-debug >> mozconfig
-          echo ac_add_options --enable-update-packaging >> mozconfig
+          echo "ac_add_options --enable-application=browser" > mozconfig
+          echo "ac_add_options --enable-optimize" >> mozconfig
+          echo "ac_add_options --disable-debug" >> mozconfig
+          echo "ac_add_options --enable-update-packaging" >> mozconfig
 
       - name: Bootstrap Environment
         shell: cmd
         env:
           MOZ_AUTOMATION: 1
-          # Manually set the variables start-shell.bat usually provides
-          MOZILLABUILD: C:\mozilla-build\
-          MSYSTEM: MINGW64
-        run: |
-          C:\mozilla-build\msys2\usr\bin\bash.exe --login -c "export PATH=$PATH:/c/Progra~1/Git/cmd:/c/Progra~1/Git/bin && cd '%GITHUB_WORKSPACE:\=/%' && ./mach --no-interactive bootstrap --application-choice=browser"
+          MOZILLABUILD: C:\mozilla-build
+        run: python mach --no-interactive bootstrap --application-choice=browser
 
       - name: Build Firefox
         shell: cmd
         env:
           MOZ_AUTOMATION: 1
-          MOZILLABUILD: C:\mozilla-build\
-          MSYSTEM: MINGW64
-        run: |
-          C:\mozilla-build\msys2\usr\bin\bash.exe --login -c "export PATH=$PATH:/c/Progra~1/Git/cmd:/c/Progra~1/Git/bin && cd '%GITHUB_WORKSPACE:\=/%' && ./mach build"
+          MOZILLABUILD: C:\mozilla-build
+        run: python mach build
 
       - name: Package Installer
         shell: cmd
         env:
           MOZ_AUTOMATION: 1
-          MOZILLABUILD: C:\mozilla-build\
-          MSYSTEM: MINGW64
-        run: |
-          C:\mozilla-build\msys2\usr\bin\bash.exe --login -c "export PATH=$PATH:/c/Progra~1/Git/cmd:/c/Progra~1/Git/bin && cd '%GITHUB_WORKSPACE:\=/%' && ./mach installer"
+          MOZILLABUILD: C:\mozilla-build
+        run: python mach installer
 
       - name: Upload Installer Artifact
         uses: actions/upload-artifact@v4
