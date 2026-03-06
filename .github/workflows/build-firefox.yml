@@ -37,21 +37,22 @@ jobs:
         env:
           MOZ_AUTOMATION: 1
           MOZILLABUILD: C:\mozilla-build
-        run: C:\mozilla-build\python\python.exe mach --no-interactive bootstrap --application-choice=browser
+        # Notice we are now pointing to \python3\python3.exe
+        run: C:\mozilla-build\python3\python3.exe mach --no-interactive bootstrap --application-choice=browser
 
       - name: Build Firefox
         shell: cmd
         env:
           MOZ_AUTOMATION: 1
           MOZILLABUILD: C:\mozilla-build
-        run: C:\mozilla-build\python\python.exe mach build
+        run: C:\mozilla-build\python3\python3.exe mach build
 
       - name: Package Installer
         shell: cmd
         env:
           MOZ_AUTOMATION: 1
           MOZILLABUILD: C:\mozilla-build
-        run: C:\mozilla-build\python\python.exe mach installer
+        run: C:\mozilla-build\python3\python3.exe mach installer
 
       - name: Upload Installer Artifact
         uses: actions/upload-artifact@v4
