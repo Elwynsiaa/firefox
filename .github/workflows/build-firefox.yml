@@ -34,23 +34,17 @@ jobs:
 
       - name: Bootstrap Environment
         shell: cmd
-        env:
-          MOZ_AUTOMATION: 1
-        # Combined: start-shell.bat + Progra~1 + --no-system-changes
+        # Removed MOZ_AUTOMATION entirely!
         run: |
           C:\mozilla-build\start-shell.bat -no-start -defterm -c "export PATH=$PATH:/c/Progra~1/Git/cmd:/c/Progra~1/Git/bin && cd '%GITHUB_WORKSPACE:\=/%' && ./mach --no-interactive bootstrap --application-choice=browser --no-system-changes"
 
       - name: Build Firefox
         shell: cmd
-        env:
-          MOZ_AUTOMATION: 1
         run: |
           C:\mozilla-build\start-shell.bat -no-start -defterm -c "export PATH=$PATH:/c/Progra~1/Git/cmd:/c/Progra~1/Git/bin && cd '%GITHUB_WORKSPACE:\=/%' && ./mach build"
 
       - name: Package Installer
         shell: cmd
-        env:
-          MOZ_AUTOMATION: 1
         run: |
           C:\mozilla-build\start-shell.bat -no-start -defterm -c "export PATH=$PATH:/c/Progra~1/Git/cmd:/c/Progra~1/Git/bin && cd '%GITHUB_WORKSPACE:\=/%' && ./mach installer"
 
